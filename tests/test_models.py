@@ -7,7 +7,7 @@ import sys
 import os
 cwd = os.getcwd()
 sys.path.append(os.path.abspath(cwd+"/tests"))
-sys.path.append(os.path.abspath(cwd+/keras2C"))
+sys.path.append(os.path.abspath(cwd+"/keras2C"))
 sys.path.append(os.path.abspath(cwd))
 
 #!/usr/bin/env python3
