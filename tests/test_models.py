@@ -3,6 +3,13 @@ This file is part of the test suite for keras2c
 Implements tests for full models
 """
 
+import sys
+import os
+cwd = os.getcwd()
+sys.path.append(os.path.abspath(cwd+"/tests"))
+sys.path.append(os.path.abspath(cwd+/keras2C"))
+sys.path.append(os.path.abspath(cwd))
+
 #!/usr/bin/env python3
 
 import unittest
