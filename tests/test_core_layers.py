@@ -47,6 +47,7 @@ def build_and_run(name, return_output=False):
     rcode = proc_output.returncode
     if rcode == 0:
         if not os.environ.get('CI'):
+            # To keep .c, .h, and executable files, the following line should be commented out
             subprocess.run('rm ' + name + '*', shell=True)
             return (rcode, proc_output.stdout) if return_output else rcode
     return rcode
