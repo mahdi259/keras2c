@@ -81,9 +81,9 @@ def test_CIFAR_10_CNN():
     model.add(keras.layers.Dropout(0.5))
     model.add(keras.layers.Dense(10))
     model.add(keras.layers.Activation('softmax'))
+    name = 'test___CIFAR_10_CNN'
     # Remove former generated files
     subprocess.run('rm ' + name + '*', shell=True)
-    name = 'test___CIFAR_10_CNN'
     keras2c_main.k2c(model, name)
     build_and_run(name)
     return
