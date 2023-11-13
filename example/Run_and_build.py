@@ -88,5 +88,5 @@ def test_CIFAR_10_CNN():
     build_and_run(name)
     return
 
-
-test_CIFAR_10_CNN()
+if __name__ == "__main__":
+    test_CIFAR_10_CNN()
