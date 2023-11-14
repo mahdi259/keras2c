@@ -61,6 +61,7 @@ def build_and_run(name, return_output=False):
 # -----------------------------------
 
 def MNIST_dense():
+    num_labels = 10
     hidden_units = 256
     dropout = 0.45
     input_size = 784
