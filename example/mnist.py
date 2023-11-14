@@ -161,7 +161,7 @@ def MNIST_dense():
     name = 'mnist_dense'
     # Remove former generated files
     subprocess.run('rm ' + name + '*', shell=True)
-    keras2c_main.k2c('mnist.h5, name)
+    keras2c_main.k2c('mnist.h5', name)
     build_and_run(name)
     return
 
