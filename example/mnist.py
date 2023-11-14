@@ -3,6 +3,7 @@ This file is part of the test suite for keras2c
 Implements tests for core layers
 """
 
+
 #!/usr/bin/env python3
 
 
@@ -20,6 +21,14 @@ from tensorflow.keras import models
 from tensorflow.keras import layers
 from tensorflow.keras.layers import Input, Dense, LSTM, Conv1D, Conv2D, ConvLSTM2D, Dot, Add, Multiply, Concatenate, Reshape, Permute, ZeroPadding1D, Cropping1D
 from tensorflow.keras.models import Model
+# ----------------------------------------------------------------------------------
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt # plotting library
+%matplotlib inline
+from keras.optimizers import Adam ,RMSprop
+from keras import  backend as K
+from keras.datasets import mnist
+# ----------------------------------------------------------------------------------
 import numpy as np
 from keras2c import keras2c_main
 import subprocess
@@ -31,7 +40,93 @@ tf.compat.v1.disable_eager_execution()
 
 CC = 'gcc'
 
+def mnist_training():
+    # load dataset
+    (x_train, y_train),(x_test, y_test) = mnist.load_data()
 
+    # count the number of unique train labels
+    unique, counts = np.unique(y_train, return_counts=True)
+    print("Train labels: ", dict(zip(unique, counts)))
+
+    # count the number of unique test labels
+    unique, counts = np.unique(y_test, return_counts=True)
+    print("\nTest labels: ", dict(zip(unique, counts)))
+    
+    # ---- Visualize
+    # sample 25 mnist digits from train dataset
+    indexes = np.random.randint(0, x_train.shape[0], size=25)
+    images = x_train[indexes]
+    labels = y_train[indexes]
+    
+    
+    
+    # plot the 25 mnist digits
+    plt.figure(figsize=(5,5))
+    for i in range(len(indexes)):
+        plt.subplot(5, 5, i + 1)
+        image = images[i]
+        plt.imshow(image, cmap='gray')
+        plt.axis('off')
+        
+    plt.show()
+    plt.savefig("mnist-samples.png")
+    plt.close('all')
+
+    
+
+    # compute the number of labels
+    num_labels = len(np.unique(y_train))
+    
+
+    # convert to one-hot vector
+    y_train = to_categorical(y_train)
+    y_test = to_categorical(y_test)
+
+    # image dimensions (assumed square)
+    image_size = x_train.shape[1]
+    input_size = image_size * image_size
+    print('input size:' + input_size)
+    
+
+    # resize and normalize
+    x_train = np.reshape(x_train, [-1, input_size])
+    x_train = x_train.astype('float32') / 255
+    x_test = np.reshape(x_test, [-1, input_size])
+    x_test = x_test.astype('float32') / 255
+    
+    
+    # network parameters
+    batch_size = 128
+    hidden_units = 256
+    dropout = 0.45
+
+    # ---- Model description
+    a = keras.layers.Input(input_size)
+    b = keras.layers.Dense(hidden_units, activation='relu', use_bias=False)(a)
+    c = keras.layers.Dropout(dropout)(b)
+    d = keras.layers.Dense(hidden_units, activation='relu', use_bias=False)(c)
+    e = keras.layers.Dropout(dropout)(d)
+    f = keras.layers.Dense(num_labels, use_bias=False)(e)
+    g = keras.layers.Activation('softmax')(f)
+    model = keras.models.Model(inputs=a, outputs=g)
+
+
+
+    model.compile(loss='categorical_crossentropy', 
+                  optimizer='adam',
+                  metrics=['accuracy'])
+    
+
+
+    model.fit(x_train, y_train, epochs=2, batch_size=batch_size)
+
+    loss, acc = model.evaluate(x_test, y_test, batch_size=batch_size)
+    print("\nTest accuracy: %.1f%%" % (100.0 * acc))
+
+    model.save("mnist.h5")
+
+
+    
 def build_and_run(name, return_output=False):
 
     cwd = os.getcwd()
@@ -61,18 +156,7 @@ def build_and_run(name, return_output=False):
 # -----------------------------------
 
 def MNIST_dense():
-    num_labels = 10
-    hidden_units = 256
-    dropout = 0.45
-    input_size = 784
-    a = keras.layers.Input(input_size)
-    b = keras.layers.Dense(hidden_units, activation='relu', use_bias=False)(a)
-    c = keras.layers.Dropout(dropout)(b)
-    d = keras.layers.Dense(hidden_units, activation='relu', use_bias=False)(c)
-    e = keras.layers.Dropout(dropout)(d)
-    f = keras.layers.Dense(num_labels, use_bias=False)(e)
-    g = keras.layers.Activation('softmax')(f)
-    model = keras.models.Model(inputs=a, outputs=g)
+    
     name = 'mnist_dense'
     # Remove former generated files
     subprocess.run('rm ' + name + '*', shell=True)
