@@ -24,10 +24,11 @@ from tensorflow.keras.models import Model
 # ----------------------------------------------------------------------------------
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt # plotting library
-%matplotlib inline
+# %matplotlib inline # matplotlib is not a python code
 from keras.optimizers import Adam ,RMSprop
 from keras import  backend as K
 from keras.datasets import mnist
+from keras.utils import to_categorical, plot_model
 # ----------------------------------------------------------------------------------
 import numpy as np
 from keras2c import keras2c_main
@@ -60,17 +61,17 @@ def mnist_training():
     
     
     
-    # plot the 25 mnist digits
-    plt.figure(figsize=(5,5))
-    for i in range(len(indexes)):
-        plt.subplot(5, 5, i + 1)
-        image = images[i]
-        plt.imshow(image, cmap='gray')
-        plt.axis('off')
+    # # plot the 25 mnist digits
+    # plt.figure(figsize=(5,5))
+    # for i in range(len(indexes)):
+    #     plt.subplot(5, 5, i + 1)
+    #     image = images[i]
+    #     plt.imshow(image, cmap='gray')
+    #     plt.axis('off')
         
-    plt.show()
-    plt.savefig("mnist-samples.png")
-    plt.close('all')
+    # plt.show()
+    # plt.savefig("mnist-samples.png")
+    # plt.close('all')
 
     
 
@@ -85,7 +86,7 @@ def mnist_training():
     # image dimensions (assumed square)
     image_size = x_train.shape[1]
     input_size = image_size * image_size
-    print('input size:' + input_size)
+    print('input size:', input_size)
     
 
     # resize and normalize
@@ -160,9 +161,10 @@ def MNIST_dense():
     name = 'mnist_dense'
     # Remove former generated files
     subprocess.run('rm ' + name + '*', shell=True)
-    keras2c_main.k2c(model, name)
+    keras2c_main.k2c('mnist.h5, name)
     build_and_run(name)
     return
 
 if __name__ == "__main__":
+    mnist_training()
     MNIST_dense()
