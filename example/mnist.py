@@ -166,7 +166,7 @@ def MNIST_test(x_test, y_test):
 
 # -----------------------------------
 if __name__ == "__main__":
-    # [input_size, num_labels, x_train, y_train, x_test, y_test] = data_preparation()
-    # mnist_training(input_size, num_labels, x_train, y_train)
-    # MNIST_test(x_test, y_test)
-    MNIST_dense()
+    [input_size, num_labels, x_train, y_train, x_test, y_test] = data_preparation()
+    mnist_training(input_size, num_labels, x_train, y_train)
+    MNIST_test(x_test, y_test)
+    # MNIST_dense()
