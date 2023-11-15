@@ -41,26 +41,24 @@ tf.compat.v1.disable_eager_execution()
 
 CC = 'gcc'
 
-def mnist_training():
+def data_preparation():
     # load dataset
     (x_train, y_train),(x_test, y_test) = mnist.load_data()
 
     # count the number of unique train labels
     unique, counts = np.unique(y_train, return_counts=True)
-    print("Train labels: ", dict(zip(unique, counts)))
+    print("Unique Train labels: ", dict(zip(unique, counts)))
 
     # count the number of unique test labels
     unique, counts = np.unique(y_test, return_counts=True)
-    print("\nTest labels: ", dict(zip(unique, counts)))
+    print("\nUnique Test labels: ", dict(zip(unique, counts)))
     
     # ---- Visualize
     # sample 25 mnist digits from train dataset
-    indexes = np.random.randint(0, x_train.shape[0], size=25)
-    images = x_train[indexes]
-    labels = y_train[indexes]
-    
-    
-    
+    # indexes = np.random.randint(0, x_train.shape[0], size=25)
+    # images = x_train[indexes]
+    # labels = y_train[indexes]
+     
     # # plot the 25 mnist digits
     # plt.figure(figsize=(5,5))
     # for i in range(len(indexes)):
@@ -71,13 +69,12 @@ def mnist_training():
         
     # plt.show()
     # plt.savefig("mnist-samples.png")
-    # plt.close('all')
+    # plt.close('all') 
 
-    
 
     # compute the number of labels
     num_labels = len(np.unique(y_train))
-    
+
 
     # convert to one-hot vector
     y_train = to_categorical(y_train)
@@ -94,7 +91,9 @@ def mnist_training():
     x_train = x_train.astype('float32') / 255
     x_test = np.reshape(x_test, [-1, input_size])
     x_test = x_test.astype('float32') / 255
-    
+
+    return [input_size, num_labels, x_train, y_train, x_test, y_test]
+def mnist_training(input_size, num_labels, x_train, y_train):
     
     # network parameters
     batch_size = 128
@@ -103,12 +102,12 @@ def mnist_training():
 
     # ---- Model description
     a = keras.layers.Input(input_size)
-    b = keras.layers.Dense(hidden_units, activation='relu', use_bias=False)(a)
-    c = keras.layers.Dropout(dropout)(b)
-    d = keras.layers.Dense(hidden_units, activation='relu', use_bias=False)(c)
-    e = keras.layers.Dropout(dropout)(d)
-    f = keras.layers.Dense(num_labels, use_bias=False)(e)
-    g = keras.layers.Activation('softmax')(f)
+    b = keras.layers.Dense(hidden_units, activation='relu', use_bias=False, name='dense_1')(a)
+    c = keras.layers.Dropout(dropout, name='dropout_1')(b)
+    d = keras.layers.Dense(hidden_units, activation='relu', use_bias=False, name='dense_2')(c)
+    e = keras.layers.Dropout(dropout, name='dropout_2')(d)
+    f = keras.layers.Dense(num_labels, use_bias=False, name='dense_3')(e)
+    g = keras.layers.Activation('softmax', name='activation_1')(f)
     model = keras.models.Model(inputs=a, outputs=g)
 
 
@@ -120,9 +119,6 @@ def mnist_training():
 
 
     model.fit(x_train, y_train, epochs=2, batch_size=batch_size)
-
-    loss, acc = model.evaluate(x_test, y_test, batch_size=batch_size)
-    print("\nTest accuracy: %.1f%%" % (100.0 * acc))
 
     model.save("mnist.h5")
 
@@ -153,9 +149,7 @@ def build_and_run(name, return_output=False):
         if not os.environ.get('CI'):
             return (rcode, proc_output.stdout) if return_output else rcode
     return rcode
-
 # -----------------------------------
-
 def MNIST_dense():
     
     name = 'mnist_dense'
@@ -164,7 +158,15 @@ def MNIST_dense():
     keras2c_main.k2c('mnist.h5', name)
     build_and_run(name)
     return
+def MNIST_test(x_test, y_test):
+  batch_size = 128
+  model = keras.models.load_model('mnist.h5')
+  loss, acc = model.evaluate(x_test, y_test, batch_size=batch_size)
+  print("\nTest accuracy: %.1f%%" % (100.0 * acc))
 
+# -----------------------------------
 if __name__ == "__main__":
-    mnist_training()
+    # [input_size, num_labels, x_train, y_train, x_test, y_test] = data_preparation()
+    # mnist_training(input_size, num_labels, x_train, y_train)
+    # MNIST_test(x_test, y_test)
     MNIST_dense()
